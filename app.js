@@ -1,10 +1,11 @@
 
+
 /**
 
 Mighty Gumball, Inc.
-Version 2.0
+Version 3.0
 
-- Rudimentary Page Templates using RegEx
+- Migrated to Handlebars Page Templates
 - REST Client Calling Go REST API 
 - Client State Validation using HMAC Key-Based Hash 
 
@@ -14,6 +15,7 @@ Serial# 1234998871109
 
 **/
 
+
 /**
 var machine = "https://pnguyen-goapi.herokuapp.com/gumball";
 var endpoint = "https://pnguyen-goapi.herokuapp.com/order";
@@ -22,8 +24,14 @@ var endpoint = "https://pnguyen-goapi.herokuapp.com/order";
 var machine = "http://localhost:3000/gumball";
 var endpoint = "http://localhost:3000/order";
 
+
+// added in v3: handlebars
+// https://www.npmjs.org/package/express3-handlebars
+// npm install express3-handlebars
+
 // added in v2: crypto
 // crypto functions:  http://nodejs.org/api/crypto.html
+
 
 var crypto = require('crypto');
 var fs = require('fs');
@@ -39,6 +47,11 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 app.use("/images", express.static(__dirname + '/images'));
+handlebars  = require('express3-handlebars');
+hbs = handlebars.create();
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
 
 var secretKey = "kwRg54x2Go9iEdl49jFENRM12Mp711QI" ;
 
@@ -59,29 +72,28 @@ var get_hash = function( state, ts ) {
 
 var error = function( req, res, msg, ts ) {
 
-    body = fs.readFileSync('./gumball.html');
-    res.setHeader('Content-Type', 'text/html');
-    res.writeHead(200);
-
+    var result = new Object() ;
     state = "error" ;
     hash = get_hash ( state, ts ) ;
 
-    var html_body = "" + body ;
-    var html_body = html_body.replace("{message}", msg );
-    var html_body = html_body.replace("{ts}", ts );
-    var html_body = html_body.replace("{hash}", hash );
-    var html_body = html_body.replace(/id="state".*value=".*"/, "id=\"state\" value=\""+state+"\"") ;
-    res.end( html_body );
-}
+    result.msg = msg ;
+    result.ts = ts ;
+    result.hash = hash ;
+    result.state = state ;
 
+    res.render('gumball', {
+        state: result.state,
+        ts: result.ts,
+        hash: result.hash,
+        message: result.msg
+    });
+
+}
 
 
 var page = function( req, res, state, ts ) {
 
-    body = fs.readFileSync('./gumball.html');
-    res.setHeader('Content-Type', 'text/html');
-    res.writeHead(200);
-
+    var result = new Object() ;
     hash = get_hash ( state, ts ) ;
     console.log( state ) ;
 
@@ -97,14 +109,20 @@ var page = function( req, res, state, ts ) {
                                 jsdata.ModelNumber + "\n" +
                                 "Serial# " + jsdata.SerialNumber + "\n" +
                                 "\n" + state +"\n\n" ;
-                    var html_body = "" + body ;
-                    var html_body = html_body.replace("{message}", msg );
-                    var html_body = html_body.replace("{ts}", ts );
-                    var html_body = html_body.replace("{hash}", hash );
-                    var html_body = html_body.replace(/id="state".*value=".*"/, "id=\"state\" value=\""+state+"\"") ;
-                    res.end( html_body );
+                    result.msg = msg ;
+                    result.ts = ts ;
+                    result.hash = hash ;
+                    result.state = state ;
+
+                    res.render('gumball', {
+                        state: result.state,
+                        ts: result.ts,
+                        hash: result.hash,
+                        message: result.msg
+                    });
             });
 }
+
 
 var order = function( req, res, state, ts ) {
 
@@ -137,7 +155,7 @@ var order = function( req, res, state, ts ) {
 }
 
 
-var handle_post = function (req, res) {
+var handle_post = function (req, res, next) {
 
     console.log( "Post: " + "Action: " +  req.body.event + " State: " + req.body.state + "\n" ) ;
     var hash1 = "" + req.body.hash ;
@@ -172,25 +190,45 @@ var handle_post = function (req, res) {
   
 }
 
-var handle_get = function (req, res) {
+var handle_get = function (req, res, next) {
     console.log( "Get: ..." ) ;
-
     ts = new Date().getTime()
     console.log( ts )
     state = "no-coin" ;
-
     page( req, res, state, ts ) ;
 }
 
 
+/*  Handlebars Test using Home template 
+
+app.get('/', function (req, res, next) {
+    res.render('home', {
+        showTitle: true,
+        helpers: {
+            foo: function () { return 'foo!'; },
+            bar: function () { return 'bar!'; }
+        }
+    });
+});
+
+*/
+
+app.get('/', handle_get ) ;
+app.post('/', handle_post ) ;
+
 app.set('port', (process.env.PORT || 8080));
-
-app.post("*", handle_post );
-app.get( "*", handle_get ) ;
-
-console.log( "Server running on Port 8080..." ) ;
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
+
+/**
+
+Mighty Gumball, Inc.
+
+NodeJS-Enabled Standing Gumball
+Model# M102988
+Serial# 1234998871109
+
+**/

@@ -1,23 +1,24 @@
+
 <html>
 <head>
-    <title>Gumball Machine (Node.js - Version 2)</title>
+    <title>Gumball Machine (Node.js - Version 3)</title>
 </head>
 
 <body>
-<h1 align="center">Welcome to the Gumball Machine (Node.js - Version 2)</h1>
+<h1 align="center">Welcome to the Gumball Machine (Node.js - Version 3)</h1>
 
 <!-- FORM SECTION -->
 <form name="gumballform" method="post" action="">
 
-<input type="hidden" name="state" id="state" value="{state}" />
-<input type="hidden" name="ts" id="ts" value="{ts}" />
-<input type="hidden" name="hash" id="hash" value="{hash}" />
+<input type="hidden" name="state" id="state" value="{{state}}" />
+<input type="hidden" name="ts" id="ts" value="{{ts}}" />
+<input type="hidden" name="hash" id="hash" value="{{hash}}" />
 
     <p>
     <div align="center">
 
 <textarea name="message" cols="50" rows="15" readonly id="message">
-{message}
+{{message}}
 </textarea>
 
     </div>
