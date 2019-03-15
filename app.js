@@ -50,7 +50,7 @@ var db_pwd  = "pwd" ;
 var db_name = "db" ;
 */
 
-var db_host = "localhost";
+var db_host = "127.0.0.1";
 var db_port = "27017";
 var db_user = "cmpe281";
 var db_pwd = "cmpe281";
@@ -255,7 +255,7 @@ db_init(function(err, results) {
     //db.collections(function(err, collections) {
     //    console.log(collections);
     //});
-    app.set("port", process.env.PORT || 3000);
+    app.set("port", process.env.PORT || 8080);
     app.listen(app.get("port"), function() {
       console.log("Node app is running on port", app.get("port"));
     });
