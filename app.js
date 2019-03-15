@@ -50,8 +50,8 @@ var db_pwd  = "pwd" ;
 var db_name = "db" ;
 */
 
-var db_host = "172.31.25.105";
- //var db_host = "127.0.0.1";
+//var db_host = "172.31.25.105";
+ var db_host = "127.0.0.1";
 var db_port = "27017";
 var db_user = "cmpe281";
 var db_pwd = "cmpe281";
